@@ -10,7 +10,7 @@
  *                Application made to practice with Node.js
  *                and Amazon Elastic Beanstalk.
  *
- * Filename:      /bot.js
+ * Filename:      /app.js
  * Description:   Main bot for sawdyornaw.
  * Last Modified: 2016-2-26
  *
