@@ -4,11 +4,11 @@
   "description": "Discord Bot using uClassify & discord.js",
   "author": "Kevin Bohinski <bohinsk1@tcnj.edu>",
   "repository": {
-    "url": "http://www.github.com/kbohinski/sawdyornaw",
+    "url": "http://www.github.com/kbohinski/discord-sawdyornaw",
     "type": "git"
   },
   "bugs": {
-    "url": "http://www.github.com/kbohinski/sawdyornaw/issues"
+    "url": "http://www.github.com/kbohinski/discord-sawdyornaw/issues"
   },
   "main": "app.js",
   "dependencies": {
