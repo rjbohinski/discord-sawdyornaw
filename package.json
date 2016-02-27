@@ -1,0 +1,18 @@
+{
+  "name": "sawdy-or-naw",
+  "version": "1.0.0",
+  "description": "Discord Bot using uClassify & discord.js",
+  "author": "Kevin Bohinski <bohinsk1@tcnj.edu>",
+  "repository": {
+    "url": "http://www.github.com/kbohinski/sawdyornaw",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "http://www.github.com/kbohinski/sawdyornaw/issues"
+  },
+  "main": "app.js",
+  "dependencies": {
+    "discord.js": "^6.0.0",
+    "request": "^2.67.0"
+  }
+}
