@@ -123,22 +123,6 @@ discord.on('message', function (msg) {
         });
     }
 
-    /* If dog is requested */
-    if (m.split(' ')[0] === '/dog' || m.split(' ')[0] === '/puppy') {
-        /* Sent GET request to API */
-        request.get('http://www.thepuppyapi.com/puppy', function (e, r, b) {
-            /* On reply, parse response */
-            var url = JSON.parse(b);
-
-            /* If no errors */
-            if (r.statusCode === 200 && !e) {
-                discord.reply(msg, url.puppy_url, opts);
-            } else {
-                discord.reply(msg, 'Err: Bad API call.', opts);
-            }
-        });
-    }
-
     /* If Michael Scott is requested */
     if (m.split(' ')[0] === '/michaelscott') {
         /* Sent GET request to API */
