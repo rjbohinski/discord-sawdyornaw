@@ -20,7 +20,7 @@
 /* Bring in requirements */
 var Discord = require('discord.js');
 var request = require('request');
-var creds = require('./cred.json');
+var creds = require('./creds.json');
 
 /* Setup discord.js */
 var discord = new Discord.Client();
@@ -99,12 +99,13 @@ discord.on('message', function (msg) {
 
     /* If help is requested */
     if (m.split(' ')[0] === '/help') {
-        var arr = ['/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott'];
-        for (var i = 0; i < arr.length; i++) {
-            discord.sendMessage(msg.channel, '`' + arr[i] + '`', opts);
-        }
-        discord.sendMessage(msg.channel, 'Version: ' + version, opts);
         discord.sendMessage(msg.channel, 'https://github.com/kbohinski/discord-sawdyornaw', opts);
+        discord.sendMessage(msg.channel, 'Version: ' + version, opts);
+        discord.sendMessage(msg.channel, 'Commands: ' + version, opts);
+        var arr = ['/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott'];
+        arr.forEach(function (i) {
+            discord.sendMessage(msg.channel, '  `' + i + '`', opts);
+        });
     }
 
     /* If dog is requested */
