@@ -1,6 +1,6 @@
 /**
  * @author Kevin Bohinski <bohinsk1@tcnj.edu>
- * @version 1.0.0
+ * @version 1.0.1
  * @since 2016-2-26
  *
  * Project Name:  sawdyornaw
@@ -32,7 +32,7 @@ var last = '';
 /* Variable for Options */
 var opts = new Object();
 
-var version = '1.0.0';
+var version = '1.0.1';
 
 /* For each message received */
 discord.on('message', function (msg) {
@@ -99,12 +99,60 @@ discord.on('message', function (msg) {
 
     /* If help is requested */
     if (m.split(' ')[0] === '/help') {
-        var arr = ['/help', '/speak', '/shutup, /emojipasta, /sawdyornaw`'];
-        arr.forEach(function (i) {
-            discord.sendMessage(msg.channel, '`' + i + '`', opts);
-        });
+        var arr = ['/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott'];
+        for (var i = 0; i < arr.length; i++) {
+            discord.sendMessage(msg.channel, '`' + arr[i] + '`', opts);
+        }
         discord.sendMessage(msg.channel, 'Version: ' + version, opts);
         discord.sendMessage(msg.channel, 'https://github.com/kbohinski/discord-sawdyornaw', opts);
+    }
+
+    /* If dog is requested */
+    if (m.split(' ')[0] === '/dog' || m.split(' ')[0] === '/puppy') {
+        /* Sent GET request to API */
+        request.get('http://www.thepuppyapi.com/puppy', function (e, r, b) {
+            /* On reply, parse response */
+            var url = JSON.parse(b).puppy_url;
+
+            /* If no errors */
+            if (r.statusCode === 200 && !e) {
+                discord.reply(msg, url, opts);
+            } else {
+                discord.reply(msg, 'Err: Bad API call.', opts);
+            }
+        });
+    }
+
+    /* If dog is requested */
+    if (m.split(' ')[0] === '/dog' || m.split(' ')[0] === '/puppy') {
+        /* Sent GET request to API */
+        request.get('http://www.thepuppyapi.com/puppy', function (e, r, b) {
+            /* On reply, parse response */
+            var url = JSON.parse(b);
+
+            /* If no errors */
+            if (r.statusCode === 200 && !e) {
+                discord.reply(msg, url.puppy_url, opts);
+            } else {
+                discord.reply(msg, 'Err: Bad API call.', opts);
+            }
+        });
+    }
+
+    /* If Michael Scott is requested */
+    if (m.split(' ')[0] === '/michaelscott') {
+        /* Sent GET request to API */
+        request.get('https://michael-scott-quotes.herokuapp.com/quote', function (e, r, b) {
+            /* On reply, parse response */
+            var quote = b.split('{ "quote": "')[1];
+
+            /* If no errors */
+            if (r.statusCode === 200 && !e) {
+                discord.reply(msg, quote.substring(0, quote.length - 1), opts);
+            } else {
+                discord.reply(msg, 'Err: Bad API call.', opts);
+            }
+        });
     }
 
     /* If berrybot says anything */
