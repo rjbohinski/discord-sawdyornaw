@@ -100,12 +100,13 @@ discord.on('message', function (msg) {
     /* If help is requested */
     if (m.split(' ')[0] === '/help') {
         discord.sendMessage(msg.channel, 'https://github.com/kbohinski/discord-sawdyornaw', opts);
-        discord.sendMessage(msg.channel, 'Version: ' + version, opts);
-        discord.sendMessage(msg.channel, 'Commands: ' + version, opts);
+        setTimeout(function () {
+            discord.sendMessage(msg.channel, 'Version: ' + version, opts);
+        }, 125);
         var arr = ['/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott'];
-        arr.forEach(function (i) {
-            discord.sendMessage(msg.channel, '  `' + i + '`', opts);
-        });
+        setTimeout(function () {
+            discord.sendMessage(msg.channel, 'Commands: `' + arr.join(' ') + '`', opts);
+        }, 125);
     }
 
     /* If dog is requested */
