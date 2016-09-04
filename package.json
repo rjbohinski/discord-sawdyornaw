@@ -10,8 +10,10 @@
   "bugs": {
     "url": "http://www.github.com/kbohinski/discord-sawdyornaw/issues"
   },
+  "scripts": {
+    "start": "node app.js"
+  },
   "main": "app.js",
-  "start": "node app.js",
   "dependencies": {
     "discord.js": "^6.0.0",
     "request": "^2.67.0",
