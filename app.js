@@ -20,12 +20,13 @@
 /* Bring in requirements */
 var Discord = require('discord.js');
 var request = require('request');
-var creds = require('./creds.json');
+//var creds = require('./creds.json');
 var cheerio = require('cheerio');
 
 /* Setup discord.js */
 var discord = new Discord.Client();
-discord.login(creds.user, creds.pass);
+//discord.login(creds.user, creds.pass);
+discord.login(process.env.user, process.env.pass);
 
 /* Variable to store last message in, and cache */
 var last = '';
