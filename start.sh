@@ -1,1 +1,1 @@
-nohup nodejs app.js & >> jobNum.txt
+nohup nodejs app.js &

@@ -214,6 +214,6 @@ discord.on('message', function (msg) {
     /* If berrybot says anything */
     if (msg.author.username === 'berrybot' || msg.author.username === 'Senpai') {
         var arr = ['nobody cares', 'you\'re irrelevant'];
-        discord.sendMessage(msg.channel, arr[Math.floor(Math.random() * arr.length)] + ', berrybot.', opts);
+        discord.sendMessage(msg.channel, arr[Math.floor(Math.random() * arr.length)] + ', ' + msg.author.username + '.', opts);
     }
 });
