@@ -12,7 +12,7 @@
  *
  * Filename:      /app.js
  * Description:   Main bot for sawdyornaw.
- * Last Modified: 2016-3-15
+ * Last Modified: 2016-9-4
  *
  * Copyright (c) 2016 Kevin Bohinski. All rights reserved.
  */
@@ -20,35 +20,37 @@
 /* Bring in requirements */
 var Discord = require('discord.js');
 var request = require('request');
-//var creds = require('./creds.json');
+var creds = require('./creds.json');
 var cheerio = require('cheerio');
 
 /* Setup discord.js */
 var discord = new Discord.Client();
-//discord.login(creds.user, creds.pass);
-discord.login(process.env.user, process.env.pass);
+discord.login(creds.discord.user, creds.discord.pass);
 
 /* Variable to store last message in, and cache */
 var last = '';
 var dankmemeCache = {time: 0};
+var emojipastaCache = {time: 0};
 
 /* Variable for Options */
 var opts = new Object();
 
-var version = '1.0.1';
+var version = '1.0.2';
 
 /* For each message received */
 discord.on('message', function (msg) {
     /* Save message, ignore included metadata */
     var m = msg['content'];
 
+    if (m.split(' ')[0] === '/http') {
+        discord.reply(msg, 'https://http.cat/' + m.split(' ')[1] + '.jpg', opts);
+    }
+
     /* If sentiment analysis is requested */
     if (m.split(' ')[0] === '/sawdyornaw') {
         /* Sent POST request to API */
-        request.post({
-            url: 'http://www.kboh.codes/discordbot/api.php',
-            form: {content: last}
-        }, function (e, r, b) {
+         var url = 'https://api.uclassify.com/v1/uclassify/Sentiment/classify/?readKey=' + creds.uclassify.read + '&text=' + last;
+         request.get(url, function (e, r, b) {
             /* If no errors */
             if (r.statusCode === 200 && !e) {
                 /* Give user indication that the bot is working */
@@ -56,21 +58,16 @@ discord.on('message', function (msg) {
 
                 /* On reply, parse response */
                 var json = JSON.parse(b);
+                var reply = 'Neutral';
 
-                if (json['status'] === 'success') {
-                    /* Parse sentiment, and write back on discord */
-                    if (json['sentiment'] === 'positive') {
-                        discord.reply(msg, 'naw', opts);
-                    } else if (json['sentiment'] === 'negative') {
-                        discord.reply(msg, 'sawdy', opts);
-                    } else if (json['sentiment'] === 'neutral') {
-                        discord.reply(msg, 'neither', opts);
-                    } else {
-                        discord.reply(msg, 'Err: Bad API response.', opts);
-                    }
-
-                    discord.stopTyping(msg.channel);
+                if (json.positive > .5) {
+                    reply = 'Naw';
+                } else if (json.negative > .5) {
+                    reply = 'Sawdy';
                 }
+
+                discord.reply(msg, reply, opts);
+                discord.stopTyping(msg.channel);
             } else {
                 discord.reply(msg, 'Err: Bad API call.', opts);
             }
@@ -82,23 +79,37 @@ discord.on('message', function (msg) {
 
     /* If /r/emojipasta is requested */
     if (m.split(' ')[0] === '/emojipasta') {
-        /* Sent GET request to API */
-        request.get('http://45.79.176.133/api.php', function (e, r, b) {
-            /* If no errors */
-            if (r.statusCode === 200 && !e) {
-                /* Give user indication that the bot is working */
-                discord.startTyping(msg.channel);
+         /* Check to see if cache is recent up to an hour */
+        if (Math.abs(((new Date).getTime() - emojipastaCache.time)) > 3600000) {
+            request.get('https://www.reddit.com/r/emojipasta/search?q=&restrict_sr=on&sort=new&t=all', function (e, r, b) {
+                /* If no errors */
+                if (r.statusCode === 200 && !e) {
+                    /* Give user indication that the bot is working */
+                    discord.startTyping(msg.channel);
 
-                /* On reply, parse response */
-                var arr = b.split('] => ');
-                var pastas = [arr[1].substring(0, arr[1].length - 3), arr[2].substring(0, arr[2].length - 3), arr[3].substring(0, arr[3].length - 3), arr[4].substring(0, arr[4].length - 3), arr[5].substring(0, arr[5].length - 1)];
+                    /* On reply, parse response */
+                    var $ = cheerio.load(b);
+                    var pastas = [];
+                    $('div.search-result').each(function (i) {
+                        pastas.push($(this).find('a.search-title').text() + ' ' + $(this).find('p').text());
+                    });
 
-                discord.reply(msg, pastas[Math.floor(Math.random() * pastas.length)], opts);
-                discord.stopTyping(msg.channel);
-            } else {
-                discord.reply(msg, 'Err: Bad API call.', opts);
-            }
-        });
+                    discord.reply(msg, pastas[Math.floor(Math.random() * pastas.length)], opts);
+                    discord.stopTyping(msg.channel);
+
+                    /* Save to cache */
+                    emojipastaCache.time = (new Date).getTime();
+                    emojipastaCache.memes = pastas;
+                } else {
+                    discord.reply(msg, 'Err: Bad API call.', opts);
+                }
+            });
+        } else {
+            /* Give user indication that the bot is working, and send message from cache. */
+            discord.startTyping(msg.channel);
+            discord.reply(msg, emojipastaCache.memes[Math.floor(Math.random() * emojipastaCache.memes.length)], opts);
+            discord.stopTyping(msg.channel);
+        }
     }
 
     /* If tts is requested */
@@ -117,7 +128,7 @@ discord.on('message', function (msg) {
         setTimeout(function () {
             discord.sendMessage(msg.channel, 'Version: ' + version, opts);
         }, 125);
-        var arr = ['/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott', '/dankmeme'];
+        var arr = ['/http', '/help', '/speak', '/shutup', '/emojipasta', '/sawdyornaw', '/dog', '/michaelscott', '/dankmeme'];
         setTimeout(function () {
             discord.sendMessage(msg.channel, 'Commands: `' + arr.join(' ') + '`', opts);
         }, 125);
@@ -125,14 +136,16 @@ discord.on('message', function (msg) {
 
     /* If dog is requested */
     if (m.split(' ')[0] === '/dog' || m.split(' ')[0] === '/puppy') {
-        /* Sent GET request to API */
+        discord.reply(msg, 'Puppy API is down :(', opts);
+        /*
+        /* Sent GET request to API /
         request.get('http://www.thepuppyapi.com/puppy', function (e, r, b) {
-            /* If no errors */
+            /* If no errors /
             if (r.statusCode === 200 && !e) {
-                /* Give user indication that the bot is working */
+                /* Give user indication that the bot is working /
                 discord.startTyping(msg.channel);
 
-                /* On reply, parse response */
+                /* On reply, parse response /
                 var url = JSON.parse(b).puppy_url;
 
                 discord.reply(msg, url, opts);
@@ -141,6 +154,7 @@ discord.on('message', function (msg) {
                 discord.reply(msg, 'Err: Bad API call.', opts);
             }
         });
+        */
     }
 
     /* If Michael Scott is requested */
@@ -198,7 +212,7 @@ discord.on('message', function (msg) {
     }
 
     /* If berrybot says anything */
-    if (msg.author.username === 'berrybot') {
+    if (msg.author.username === 'berrybot' || msg.author.username === 'Senpai') {
         var arr = ['nobody cares', 'you\'re irrelevant'];
         discord.sendMessage(msg.channel, arr[Math.floor(Math.random() * arr.length)] + ', berrybot.', opts);
     }
